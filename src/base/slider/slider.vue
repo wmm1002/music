@@ -66,7 +66,6 @@
 					width+=2*sliderWidth
 				}
 				this.$refs.sliderGroup.style.width=width+'px'
-				console.log(111)
 			},
 			_initSlider: function(){
 				this.slider=new BScroll(this.$refs.slider, {

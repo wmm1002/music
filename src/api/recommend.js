@@ -1,4 +1,5 @@
 import jsonp from 'common/js/jsonp'
+import axios from 'axios'
 import {
 	commonParams,
 	options
