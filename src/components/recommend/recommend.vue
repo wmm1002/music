@@ -1,12 +1,12 @@
 <template>
 	<div class="recommend">
-		<scroll class="recommend-content" :data="discList">
+		<scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
   			<div v-if="recommend.length" class="slider-wrapper">
   				<slider>
               <div v-for="item in recommend">
                 <a :href="item.linkUrl">
-                  <img class="needsclick" :src="item.picUrl" alt="">
+                  <img @load="loadImg" class="needsclick" :src="item.picUrl" alt="">
                 </a>
               </div>
           </slider>
@@ -26,11 +26,15 @@
           </ul>
   			</div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <loading></loading>
+      </div>
 		</scroll>
 	</div>
 </template>
 <script>
   import Slider from 'base/slider/slider'
+  import Loading from 'base/loading/loading'
   import Scroll from 'base/scroll/scroll'
   import {getRecommend,getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
@@ -47,14 +51,14 @@
     },
     components:{
       Slider,
-      Scroll
+      Scroll,
+      Loading
     },
     methods:{
       _getRecommend: function(){
         getRecommend().then((res)=> {
           if(res.code === ERR_OK) {
             this.recommend=res.data.slider
-            console.log(res.data.slider)
           }
         })
       },
@@ -62,9 +66,14 @@
         getDiscList().then((res)=>{
           if(res.code===ERR_OK){
             this.discList=res.data.list
-            console.log(this.discList)
           }
         })
+      },
+      loadImg: function(){
+        if(!this.checkLoad){
+          this.$refs.scroll.refresh();
+          this.checkLoad=true;
+        }
       }
     }
   }
