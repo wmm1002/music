@@ -18,7 +18,11 @@
    			data: {
    				type: Array,
    				default: null
-   			}
+   			},
+            listenscroll:{
+               type: Boolean,
+               default: false
+            }
    		},
    		mounted: function(){
    			setTimeout(()=>{
@@ -34,6 +38,13 @@
    					probeType: this.probeType,
    					click: this.click
    				})
+
+               if(this.listenscroll){
+                  let me=this
+                  this.scroll.on('scroll',(pos)=>{
+                     me.$emit('scroll',pos)
+                  })
+               }
    			},
    			enable: function(){
    				this.scroll && this.scroll.enable()
