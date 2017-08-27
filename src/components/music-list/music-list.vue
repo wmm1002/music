@@ -7,16 +7,18 @@
 		<div class="bg-image" ref="bgImage" :style="bgStyle">
 			<div class="filter" ref="filter"></div>
 		</div>
-		<scroll :data="songs" class="list">
+    <div class="bg-layer" ref="layer"></div>
+		<scroll :probeType="probeType" :listenscroll="listenScroll" @scroll="scroll" :data="songs" class="list" ref="list">
 			<div class="song-list-wrapper">
 				<song-list :songs="songs"></song-list>
 			</div>
 		</scroll>
-	</div> 
+	</div>
 </template>
 <script>
 	import Scroll from 'base/scroll/scroll'
 	import SongList from 'base/song-list/song-list'
+  const RESERVED_HEIGHT=40
 	export default{
 		props: {
 			bgImage: {
@@ -32,6 +34,11 @@
 				default: ''
 			}
 		},
+    data(){
+		  return {
+		    scrollY: 0
+      }
+    },
 		components: {
 			Scroll,
 			SongList
@@ -41,11 +48,53 @@
 				return `background-image:url(${this.bgImage})`
 			}
 		},
+    created(){
+      this.probeType=3;
+      this.listenScroll=true;
+    },
+    mounted(){
+      this.imageHeight=this.$refs.bgImage.clientHeight;
+      this.minTransalteY=-this.imageHeight+RESERVED_HEIGHT;
+		  this.$refs.list.$el.style.top=`${this.imageHeight}px`
+    },
 		methods: {
+      scroll(pos){
+        this.scrollY=pos.y;
+      },
 			back(){
 				this.$router.back()
 			}
-		}
+		},
+    watch: {
+      scrollY(newY){
+        let transformY=Math.max(this.minTransalteY,newY);
+        let zIndex=0;
+        let scale=1;
+        let blur=0;
+        this.$refs.layer.style['transform']=`translate3d(0,${transformY}px,0)`;
+        this.$refs.layer.style['webkitTransform']=`translate3d(0,${transformY}px,0)`;
+        let percent=Math.abs(newY/this.imageHeight);
+        if(newY>0){
+          scale=1+percent;
+          zIndex=10;
+        }else{
+          blur=Math.min(20*percent,20);
+        }
+        this.$refs.filter.style['backdrop-filter']=`blur(${blur}px)`;
+        this.$refs.filter.style['webkitBackdrop-filter']=`blur(${blur}px)`;
+        if(newY<this.minTransalteY){
+          zIndex=10;
+          this.$refs.bgImage.style.paddingTop=0;
+          this.$refs.bgImage.style.height=`${RESERVED_HEIGHT}px`;
+        }else{
+          this.$refs.bgImage.style.paddingTop='70%';
+          this.$refs.bgImage.style.height=0;
+        }
+        this.$refs.bgImage.style.zIndex=zIndex;
+        this.$refs.bgImage.style['transform']=`scale(${scale})`;
+        this.$refs.bgImage.style['webkitTransform']=`scale(${scale})`;
+      }
+    }
 	}
 </script>
 <style scoped lang="stylus">
