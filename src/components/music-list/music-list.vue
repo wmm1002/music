@@ -18,7 +18,11 @@
 <script>
 	import Scroll from 'base/scroll/scroll'
 	import SongList from 'base/song-list/song-list'
+  import {prefixStyle} from 'common/js/dom'
+
   const RESERVED_HEIGHT=40
+  const transform=prefixStyle('transform')
+  const backdrop=prefixStyle('backdrop-filter')
 	export default{
 		props: {
 			bgImage: {
@@ -71,8 +75,7 @@
         let zIndex=0;
         let scale=1;
         let blur=0;
-        this.$refs.layer.style['transform']=`translate3d(0,${transformY}px,0)`;
-        this.$refs.layer.style['webkitTransform']=`translate3d(0,${transformY}px,0)`;
+        this.$refs.layer.style[transform]=`translate3d(0,${transformY}px,0)`;
         let percent=Math.abs(newY/this.imageHeight);
         if(newY>0){
           scale=1+percent;
@@ -80,8 +83,7 @@
         }else{
           blur=Math.min(20*percent,20);
         }
-        this.$refs.filter.style['backdrop-filter']=`blur(${blur}px)`;
-        this.$refs.filter.style['webkitBackdrop-filter']=`blur(${blur}px)`;
+        this.$refs.filter.style[backdrop]=`blur(${blur}px)`;
         if(newY<this.minTransalteY){
           zIndex=10;
           this.$refs.bgImage.style.paddingTop=0;
@@ -91,8 +93,7 @@
           this.$refs.bgImage.style.height=0;
         }
         this.$refs.bgImage.style.zIndex=zIndex;
-        this.$refs.bgImage.style['transform']=`scale(${scale})`;
-        this.$refs.bgImage.style['webkitTransform']=`scale(${scale})`;
+        this.$refs.bgImage.style[transform]=`scale(${scale})`;
       }
     }
 	}
