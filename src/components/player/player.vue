@@ -217,11 +217,10 @@
         this.songReady=false
       },
       ready(){
-        this.songReady=true;
-        console.log(this.currentSong)
+        this.songReady=true
       },
       error(){
-        this.songReady=true;
+        this.songReady=true
       },
       updateTime(e){
         this.currentTime=e.target.currentTime
@@ -296,6 +295,7 @@
         }
         this.$nextTick(()=>{
           this.$refs.audio.play()
+          this.currentSong.getLyric()
         })
       },
       playing(newPlaying){
