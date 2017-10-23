@@ -26,6 +26,9 @@
                 <img class="image" :src="currentSong.image" alt="">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric&&currentLyric.lines">
             <div class="lyric-wrapper">
@@ -115,7 +118,8 @@
         currentTime: 0,
         currentLyric: null,
         currentLineNum: 0,
-        currentShow: 'cd'
+        currentShow: 'cd',
+        playingLyric: ''
       }
     },
 		computed: {
@@ -201,6 +205,9 @@
           return
         }
         this.setPlayingState(!this.playing)
+        if(this.currentLyric){
+          this.currentLyric.togglePlay();
+        }
       },
       end(){
         if(this.mode===playMode.loop){
@@ -212,6 +219,9 @@
       loop(){
         this.$refs.audio.currentTime=0
         this.$refs.audio.play()
+        if(this.currentLyric){
+          this.currentLyric.seek(0)
+        }
       },
       next(){
         if(!this.songReady){
@@ -257,9 +267,13 @@
         return `${minute}:${second}`
       },
       onProgressBarChange(percent){
-        this.$refs.audio.currentTime=this.currentSong.duration*percent
+        const currentTime=this.currentSong.duration*percent
+        this.$refs.audio.currentTime=currentTime
         if(!this.playing){
           this.togglePlaying()
+        }
+        if(this.currentLyric){
+          this.currentLyric.seek(currentTime*1000)
         }
       },
       changeMode(){
@@ -385,6 +399,9 @@
       currentSong(newSong,oldSong){
         if(newSong.id===oldSong.id){
           return 
+        }
+        if(this.currentLyric){
+          this.currentLyric.stop();
         }
         this.$nextTick(()=>{
           this.$refs.audio.play()
